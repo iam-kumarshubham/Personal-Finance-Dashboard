@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from app.models.asset import Asset
-from app.schemas.asset import AssetCreate
+from models.asset import Asset
+from schemas.asset import AssetCreate
 
 class AssetRepository:
     @staticmethod

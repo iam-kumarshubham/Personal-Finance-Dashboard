@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from app.repositories.transaction_repository import TransactionRepository
-from app.schemas.transaction import TransactionCreate
+from repositories.transaction_repository import TransactionRepository
+from schemas.transaction import TransactionCreate
 
 class TransactionService:
     @staticmethod

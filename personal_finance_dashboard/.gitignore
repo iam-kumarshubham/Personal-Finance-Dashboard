@@ -1,0 +1,78 @@
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Python compiled files
+__pycache__/
+*.py[cod]
+*.so
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+*.swp
+
+# Logs and databases
+logs/
+*.log
+*.sqlite3
+*.db
+
+# Environment variables
+.env
+*.env
+
+# Migrations
+alembic/versions/*.pyc
+alembic/versions/*.pyo
+alembic/versions/__pycache__/
+
+# Node.js dependencies
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build and output
+dist/
+build/
+*.tar.gz
+*.whl
+
+# Static & media files (if applicable)
+staticfiles/
+mediafiles/
+
+# React cache and compiled files
+.next/
+out/
+*.cache
+public/build/
+
+# Docker
+docker-compose.override.yml
+.dockerignore
+
+# Ignore test coverage reports
+.coverage
+coverage.xml
+htmlcov/
+nosetests.xml
+pytest_cache/
+junit.xml
+
+# Ignore database dumps
+*.sql
+*.dump
+*.backup
+
+# Ignore deployment files
+.env.production
+.env.local
+.vercel/
+.netlify/
+
+# Ignore Python mypy cache
+.mypy_cache/

@@ -1,12 +1,19 @@
 from sqlalchemy.orm import Session
-from app.repositories.asset_repository import AssetRepository
-from app.schemas.asset import AssetCreate
+from repositories.user_repository import UserRepository
+from utils.security import verify_password, create_access_token
+from schemas.user import UserCreate
 
-class AssetService:
+class AuthService:
     @staticmethod
-    def add_user_asset(db: Session, asset_data: AssetCreate, user_id: int):
-        return AssetRepository.add_asset(db, asset_data, user_id)
+    def register_user(db: Session, user_data: UserCreate):
+        existing_user = UserRepository.get_user_by_email(db, user_data.email)
+        if existing_user:
+            raise ValueError("User already exists")
+        return UserRepository.create_user(db, user_data)
 
     @staticmethod
-    def get_user_assets(db: Session, user_id: int):
-        return AssetRepository.get_assets_by_user(db, user_id)
+    def authenticate_user(db: Session, email: str, password: str):
+        user = UserRepository.get_user_by_email(db, email)
+        if not user or not verify_password(password, user.password_hash):
+            return None
+        return create_access_token({"sub": user.email})
