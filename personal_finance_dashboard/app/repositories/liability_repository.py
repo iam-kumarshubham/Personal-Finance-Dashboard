@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from models.liability import Liability
-from schemas.liability import LiabilityCreate
+from app.models.liability import Liability
+from app.schemas.liability import LiabilityCreate
 
 class LiabilityRepository:
     @staticmethod

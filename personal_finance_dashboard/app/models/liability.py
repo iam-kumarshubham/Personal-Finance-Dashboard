@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import relationship
-from db.base import Base
+from app.db.base import Base
 
 class Liability(Base):
     __tablename__ = "liabilities"

@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
-from repositories.user_repository import UserRepository
-from utils.security import verify_password, create_access_token
-from schemas.user import UserCreate
+from app.repositories.user_repository import UserRepository
+from app.utils.security import verify_password, create_access_token
+from app.schemas.user import UserCreate
 
 class AuthService:
     @staticmethod

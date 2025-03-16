@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from models.asset import Asset
-from models.liability import Liability
+from app.models.asset import Asset
+from app.models.liability import Liability
 
 class NetWorthRepository:
     @staticmethod

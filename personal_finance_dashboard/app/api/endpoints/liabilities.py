@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from schemas.liability import LiabilityCreate
-from services.liability_service import LiabilityService
-from db.session import get_db
-from utils.dependencies import get_current_user
+from app.schemas.liability import LiabilityCreate
+from app.services.liability_service import LiabilityService
+from app.db.session import get_db
+from app.utils.dependencies import get_current_user
 
 router = APIRouter()
 

@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from api.endpoints import auth, transactions, assets, liabilities, net_worth
+from app.api.endpoints import auth, transactions, assets, liabilities, net_worth
 
 app = FastAPI(title="Personal Finance API")
 

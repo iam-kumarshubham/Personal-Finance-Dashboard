@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from models.asset import Asset
-from models.liability import Liability
+from app.models.asset import Asset
+from app.models.liability import Liability
 
 def calculate_net_worth(db: Session, user_id: int):
     total_assets = db.query(Asset).filter(Asset.user_id == user_id).sum(Asset.value) or 0

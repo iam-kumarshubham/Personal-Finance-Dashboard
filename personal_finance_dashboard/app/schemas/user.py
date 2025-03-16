@@ -3,13 +3,15 @@ from datetime import datetime
 
 class UserLogin(BaseModel):
     email: EmailStr
-    name: str
+    password: str
 
 class UserCreate(UserLogin):
-    password: str
+    name: str
 
 class UserResponse(UserLogin):
     id: int
+    email: EmailStr
+    name: str
     created_at: datetime
 
     class Config:

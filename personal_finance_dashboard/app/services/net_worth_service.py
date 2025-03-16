@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from repositories.net_worth_repository import NetWorthRepository
+from app.repositories.net_worth_repository import NetWorthRepository
 
 class NetWorthService:
     @staticmethod

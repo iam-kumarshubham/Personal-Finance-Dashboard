@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from services.net_worth_service import NetWorthService
-from db.session import get_db
-from utils.dependencies import get_current_user
+from app.services.net_worth_service import NetWorthService
+from app.db.session import get_db
+from app.utils.dependencies import get_current_user
 
 router = APIRouter()
 

@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from datetime import datetime
-from db.base import Base
+from app.db.base import Base
 
 class Transaction(Base):
     __tablename__ = "transactions"
