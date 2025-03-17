@@ -33,9 +33,9 @@ def create_transaction(
     """
     Create new transaction.
     """
-    transaction = crud.transaction.create_with_user(
-        db=db, obj_in=transaction_in, user_id=current_user.id
-    )
+    transaction_data = transaction_in.dict()
+    transaction_data["user_id"] = current_user.id
+    transaction = crud.transaction.create(db=db, obj_in=schemas.TransactionCreate(**transaction_data))
     return transaction
 
 @router.put("/{transaction_id}", response_model=schemas.Transaction)

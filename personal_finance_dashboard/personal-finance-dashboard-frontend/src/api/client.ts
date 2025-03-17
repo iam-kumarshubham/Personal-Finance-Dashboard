@@ -22,7 +22,15 @@ apiClient.interceptors.request.use((config) => {
 // Auth endpoints
 export const auth = {
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-    const response = await apiClient.post<AuthResponse>('/auth/login', credentials);
+    const formData = new URLSearchParams();
+    formData.append('username', credentials.email);
+    formData.append('password', credentials.password);
+    
+    const response = await apiClient.post<AuthResponse>('/auth/login', formData, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
     localStorage.setItem('token', response.data.access_token);
     return response.data;
   },

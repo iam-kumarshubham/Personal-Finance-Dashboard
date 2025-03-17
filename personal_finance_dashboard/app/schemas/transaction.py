@@ -11,7 +11,7 @@ class TransactionBase(BaseModel):
     date: datetime
 
 class TransactionCreate(TransactionBase):
-    pass
+    user_id: Optional[int] = None
 
 class TransactionUpdate(TransactionBase):
     pass
