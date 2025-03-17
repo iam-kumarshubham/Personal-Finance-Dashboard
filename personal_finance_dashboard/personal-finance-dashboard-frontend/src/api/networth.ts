@@ -1,33 +1,12 @@
 import { supabase } from "../services/supabase";
 
-// Fetch net worth data
-export const getNetWorth = async () => {
-  const { data, error } = await supabase
-    .from("net_worth")
-    .select("*")
-    .order("date", { ascending: false });
+export const fetchNetWorth = async () => {
+  const { data: assetsData, error: assetsError } = await supabase.from("assets").select("*");
+  const { data: liabilitiesData, error: liabilitiesError } = await supabase.from("liabilities").select("*");
 
-  if (error) throw error;
-  return data;
-};
+  if (assetsError || liabilitiesError) throw new Error("Error fetching net worth data");
 
-// Add a new net worth entry
-export const addNetWorthEntry = async (entry: any) => {
-  const { error } = await supabase.from("net_worth").insert([entry]);
-
-  if (error) throw error;
-};
-
-// Update an existing net worth entry
-export const updateNetWorthEntry = async (id: string, entry: any) => {
-  const { error } = await supabase.from("net_worth").update(entry).eq("id", id);
-
-  if (error) throw error;
-};
-
-// Delete a net worth entry
-export const deleteNetWorthEntry = async (id: string) => {
-  const { error } = await supabase.from("net_worth").delete().eq("id", id);
-
-  if (error) throw error;
+  const assets = assetsData.reduce((acc, item) => acc + item.amount, 0);
+  const liabilities = liabilitiesData.reduce((acc, item) => acc + item.amount, 0);
+  return { assets, liabilities, netWorth: assets - liabilities };
 };

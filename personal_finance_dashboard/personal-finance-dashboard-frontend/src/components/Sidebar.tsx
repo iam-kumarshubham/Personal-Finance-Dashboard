@@ -2,28 +2,14 @@ import { Link } from "react-router-dom";
 
 const Sidebar = () => {
   return (
-    <aside className="w-64 bg-white shadow-lg h-screen p-5">
-      <h2 className="text-xl font-bold mb-6">Finance Dashboard</h2>
-      <nav>
-        <ul className="space-y-4">
-          <li>
-            <Link to="/dashboard" className="block p-2 text-gray-700 hover:bg-gray-200 rounded">
-              📊 Dashboard
-            </Link>
-          </li>
-          <li>
-            <Link to="/transactions" className="block p-2 text-gray-700 hover:bg-gray-200 rounded">
-              💰 Transactions
-            </Link>
-          </li>
-          <li>
-            <Link to="/net-worth" className="block p-2 text-gray-700 hover:bg-gray-200 rounded">
-              🏦 Net Worth
-            </Link>
-          </li>
-        </ul>
+    <div className="w-64 h-screen bg-gray-800 text-white flex flex-col p-5">
+      <h2 className="text-xl font-semibold mb-6">Finance Dashboard</h2>
+      <nav className="flex flex-col space-y-4">
+        <Link to="/" className="hover:text-blue-400">Dashboard</Link>
+        <Link to="/transactions" className="hover:text-blue-400">Transactions</Link>
+        <Link to="/net-worth" className="hover:text-blue-400">Net Worth</Link>
       </nav>
-    </aside>
+    </div>
   );
 };
 

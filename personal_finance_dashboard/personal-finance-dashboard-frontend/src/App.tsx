@@ -1,21 +1,13 @@
-import { Routes, Route } from "react-router-dom";
-import Dashboard from "./pages/Dashboard";
-import Transactions from "./pages/Transactions";
-import NetWorth from "./pages/NetWorth";
-import Login from "./pages/auth/Login";
-import Signup from "./pages/auth/Signup";
+// src/App.tsx
+import React from 'react';
+import { AuthProvider } from './context/AuthContext';
+import { AppRouter } from './router';
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-100">
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/transactions" element={<Transactions />} />
-        <Route path="/net-worth" element={<NetWorth />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-      </Routes>
-    </div>
+    <AuthProvider>
+      <AppRouter />
+    </AuthProvider>
   );
 }
 

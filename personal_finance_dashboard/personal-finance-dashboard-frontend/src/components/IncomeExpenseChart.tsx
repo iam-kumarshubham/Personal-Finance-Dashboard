@@ -1,29 +1,22 @@
-import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
-import { useIncomeExpenseTrends } from "../hooks/useCharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
-const IncomeExpenseChart = () => {
-  const { data, isLoading, error } = useIncomeExpenseTrends() as { data: { date: string; type: string; amount: number }[]; isLoading: boolean; error: any };
+interface ChartProps {
+  data: { month: string; income: number; expenses: number }[];
+}
 
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Error loading data.</p>;
-
-  const formattedData = data.map((item: any) => ({
-    date: new Date(item.date).toLocaleDateString(),
-    income: item.type === "income" ? item.amount : 0,
-    expense: item.type === "expense" ? item.amount : 0,
-  }));
-
+const IncomeExpenseChart = ({ data }: ChartProps) => {
   return (
-    <div className="p-4">
-      <h2 className="text-lg font-bold mb-2">Income vs Expenses (Last 6 Months)</h2>
+    <div className="bg-white p-4 rounded-lg shadow-md">
+      <h3 className="text-lg font-semibold mb-2">Income vs. Expenses Trends</h3>
       <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={formattedData}>
-          <XAxis dataKey="date" />
+        <LineChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="month" />
           <YAxis />
           <Tooltip />
-          <CartesianGrid stroke="#ccc" />
-          <Line type="monotone" dataKey="income" stroke="#4CAF50" />
-          <Line type="monotone" dataKey="expense" stroke="#FF5733" />
+          <Legend />
+          <Line type="monotone" dataKey="income" stroke="#4CAF50" strokeWidth={2} />
+          <Line type="monotone" dataKey="expenses" stroke="#F44336" strokeWidth={2} />
         </LineChart>
       </ResponsiveContainer>
     </div>

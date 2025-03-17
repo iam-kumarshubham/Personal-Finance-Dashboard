@@ -1,35 +1,24 @@
-import { PieChart, Pie, Tooltip, Cell, ResponsiveContainer } from "recharts";
-import { useExpenseBreakdown } from "../hooks/useCharts";
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
-const COLORS = ["#FF5733", "#33FF57", "#3357FF", "#FF33A1", "#FFDB33"];
+interface PieChartProps {
+  data: { category: string; amount: number }[];
+}
 
-const ExpensePieChart = () => {
-  const { data, isLoading, error } = useExpenseBreakdown();
+const COLORS = ["#FF5733", "#33FF57", "#3357FF", "#F3FF33", "#FF33A1"];
 
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Error loading data.</p>;
-
-  const formattedData = (data as { category: string; amount: number }[]).reduce((acc: any, item: any) => {
-    const existing = acc.find((d: any) => d.category === item.category);
-    if (existing) {
-      existing.value += item.amount;
-    } else {
-      acc.push({ category: item.category, value: item.amount });
-    }
-    return acc;
-  }, []);
-
+const ExpensePieChart = ({ data }: PieChartProps) => {
   return (
-    <div className="p-4">
-      <h2 className="text-lg font-bold mb-2">Expense Breakdown by Category</h2>
+    <div className="bg-white p-4 rounded-lg shadow-md">
+      <h3 className="text-lg font-semibold mb-2">Expense Breakdown</h3>
       <ResponsiveContainer width="100%" height={300}>
         <PieChart>
-          <Pie data={formattedData} dataKey="value" nameKey="category" cx="50%" cy="50%" outerRadius={80}>
-            {formattedData.map((_: any, index: number) => (
+          <Pie data={data} dataKey="amount" nameKey="category" cx="50%" cy="50%" outerRadius={100} fill="#8884d8">
+            {data.map((_, index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
             ))}
           </Pie>
           <Tooltip />
+          <Legend />
         </PieChart>
       </ResponsiveContainer>
     </div>

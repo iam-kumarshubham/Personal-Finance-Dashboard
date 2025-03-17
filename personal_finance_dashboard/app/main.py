@@ -1,10 +1,26 @@
 from fastapi import FastAPI
-from app.api.endpoints import auth, transactions, assets, liabilities, net_worth
+from fastapi.middleware.cors import CORSMiddleware
+from app.core.config import settings
+from app.api.api import api_router
 
-app = FastAPI(title="Personal Finance API")
+app = FastAPI(
+    title=settings.PROJECT_NAME,
+    version=settings.VERSION,
+    openapi_url=f"{settings.API_V1_STR}/openapi.json"
+)
 
-app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
-app.include_router(transactions.router, prefix="/transactions", tags=["Transactions"])
-app.include_router(assets.router, prefix="/assets", tags=["Assets"])
-app.include_router(liabilities.router, prefix="/liabilities", tags=["Liabilities"])
-app.include_router(net_worth.router, prefix="/net-worth", tags=["Net Worth"])
+# Set up CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # In production, replace with specific origins
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Include API router
+app.include_router(api_router, prefix=settings.API_V1_STR)
+
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to Personal Finance Dashboard API"}

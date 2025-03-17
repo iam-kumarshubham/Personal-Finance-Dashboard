@@ -1,60 +1,77 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { supabase } from "../services/supabase";
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { User, LoginCredentials, SignUpCredentials } from '../types';
+import { auth } from '../api/client';
 
 interface AuthContextType {
-  user: any;
-  login: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
+  user: User | null;
+  loading: boolean;
+  error: string | null;
+  login: (credentials: LoginCredentials) => Promise<void>;
+  signup: (credentials: SignUpCredentials) => Promise<void>;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<any>(null);
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const getUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      setUser(data.user);
-    };
-    getUser();
-
-    // Listen for auth changes
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user || null);
-    });
-
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
+    const token = localStorage.getItem('token');
+    if (token) {
+      auth.getCurrentUser()
+        .then(setUser)
+        .catch(() => {
+          localStorage.removeItem('token');
+          setUser(null);
+        })
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
   }, []);
 
-  const login = async (email: string, password: string) => {
-    await supabase.auth.signInWithPassword({ email, password });
+  const login = async (credentials: LoginCredentials) => {
+    try {
+      setError(null);
+      await auth.login(credentials);
+      const user = await auth.getCurrentUser();
+      setUser(user);
+    } catch (err) {
+      setError('Invalid email or password');
+      throw err;
+    }
   };
 
-  const signUp = async (email: string, password: string) => {
-    await supabase.auth.signUp({ email, password });
+  const signup = async (credentials: SignUpCredentials) => {
+    try {
+      setError(null);
+      await auth.signup(credentials);
+      await login({ email: credentials.email, password: credentials.password });
+    } catch (err) {
+      setError('Failed to create account');
+      throw err;
+    }
   };
 
-  const logout = async () => {
-    await supabase.auth.signOut();
+  const logout = () => {
+    localStorage.removeItem('token');
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, signUp, logout }}>
+    <AuthContext.Provider value={{ user, loading, error, login, signup, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-// Custom hook to use AuthContext
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };

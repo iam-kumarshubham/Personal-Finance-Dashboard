@@ -1,20 +1,32 @@
-from pydantic import BaseModel
+from typing import Optional
 from datetime import datetime
-from typing import Literal
+from pydantic import BaseModel
+from app.models.transaction import TransactionType
 
 class TransactionBase(BaseModel):
-    type: Literal["income", "expense"]
+    type: TransactionType
     category: str
     amount: float
+    description: Optional[str] = None
     date: datetime
-    description: str | None = None
 
 class TransactionCreate(TransactionBase):
     pass
 
-class TransactionResponse(TransactionBase):
+class TransactionUpdate(TransactionBase):
+    pass
+
+class TransactionInDBBase(TransactionBase):
     id: int
     user_id: int
+    created_at: datetime
+    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
+
+class Transaction(TransactionInDBBase):
+    pass
+
+class TransactionInDB(TransactionInDBBase):
+    pass

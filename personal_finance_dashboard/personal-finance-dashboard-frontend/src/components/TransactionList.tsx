@@ -11,7 +11,7 @@ const TransactionList = () => {
     <div className="p-4">
       <h2 className="text-lg font-bold mb-2">Transactions</h2>
       <ul className="space-y-2">
-        {data && data.map((transaction: any) => (
+        {Array.isArray(data) && data.map((transaction: any) => (
           <li key={transaction.id} className="flex justify-between items-center p-2 border rounded bg-gray-100">
             <span>{transaction.category} - ${transaction.amount}</span>
             <button onClick={() => deleteTransaction.mutate(transaction.id)} className="text-red-500">

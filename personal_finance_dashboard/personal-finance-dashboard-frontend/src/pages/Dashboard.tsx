@@ -1,86 +1,123 @@
-import { useState, useEffect } from "react";
-import IncomeVsExpensesChart from "../components/charts/IncomeVsExpensesChart";
-import NetWorthChart from "../components/charts/NetWorthChart";
-import ExpenseBreakdownChart from "../components/charts/ExpenseBreakdownChart";
-import { getTransactions } from "../api/transactions";
-import { getNetWorth } from "../api/networth";
+import React, { useEffect, useState } from 'react';
+import { SummaryCard } from '../components/SummaryCard';
+import { RecentTransactions } from '../components/RecentTransactions';
+import { transactions, netWorth } from '../api/client';
+import { Transaction, NetWorth as NetWorthType } from '../types';
 
-const Dashboard = () => {
-  const [incomeExpensesData, setIncomeExpensesData] = useState<{ month: string; income: number; expenses: number }[]>([]);
-  const [netWorthData, setNetWorthData] = useState<{ date: string; value: number }[]>([]);
-  const [expenseBreakdownData, setExpenseBreakdownData] = useState<{ category: string; amount: number }[]>([]);
+const Dashboard: React.FC = () => {
+  const [netWorthData, setNetWorthData] = useState<NetWorthType | null>(null);
+  const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
+  const [transactionSummary, setTransactionSummary] = useState({
+    total_income: 0,
+    total_expenses: 0,
+    net_income: 0,
+  });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const transactions = await getTransactions();
-      const netWorth = await getNetWorth();
+    const fetchDashboardData = async () => {
+      try {
+        const [netWorthResponse, transactionsResponse, summaryResponse] = await Promise.all([
+          netWorth.getNetWorth(),
+          transactions.getAll(),
+          transactions.getSummary(),
+        ]);
 
-      // Process income vs. expenses (last 6 months)
-      const incomeExpenses = processIncomeExpenses(transactions);
-      setIncomeExpensesData(incomeExpenses);
-
-      // Process net worth trend
-      setNetWorthData(netWorth);
-
-      // Process expense breakdown
-      const expenses = transactions.filter((t: any) => t.type === "expense");
-      const breakdown = processExpenseBreakdown(expenses);
-      setExpenseBreakdownData(breakdown);
+        setNetWorthData(netWorthResponse);
+        setRecentTransactions(transactionsResponse.slice(0, 5)); // Get only the 5 most recent transactions
+        setTransactionSummary(summaryResponse);
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    fetchData();
+    fetchDashboardData();
   }, []);
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="p-4 border rounded bg-white">
-          <h2 className="text-lg font-bold">Income vs. Expenses (Last 6 Months)</h2>
-          <IncomeVsExpensesChart data={incomeExpensesData} />
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <SummaryCard
+          title="Net Worth"
+          value={netWorthData?.net_worth || 0}
+          icon={<span className="text-white text-xl">💰</span>}
+          color="bg-indigo-500"
+        />
+        <SummaryCard
+          title="Total Assets"
+          value={netWorthData?.total_assets || 0}
+          icon={<span className="text-white text-xl">📈</span>}
+          color="bg-green-500"
+        />
+        <SummaryCard
+          title="Total Liabilities"
+          value={netWorthData?.total_liabilities || 0}
+          icon={<span className="text-white text-xl">📉</span>}
+          color="bg-red-500"
+        />
+        <SummaryCard
+          title="Net Income"
+          value={transactionSummary.net_income}
+          icon={<span className="text-white text-xl">💵</span>}
+          color="bg-blue-500"
+          trend={{
+            value: transactionSummary.net_income,
+            isPositive: transactionSummary.net_income >= 0,
+          }}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <div className="bg-white shadow rounded-lg p-6">
+          <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+            Income vs Expenses
+          </h3>
+          <div className="space-y-4">
+            <div>
+              <div className="flex justify-between text-sm text-gray-500 mb-1">
+                <span>Income</span>
+                <span>{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(transactionSummary.total_income)}</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className="bg-green-500 h-2 rounded-full"
+                  style={{
+                    width: `${(transactionSummary.total_income / (transactionSummary.total_income + transactionSummary.total_expenses)) * 100}%`,
+                  }}
+                ></div>
+              </div>
+            </div>
+            <div>
+              <div className="flex justify-between text-sm text-gray-500 mb-1">
+                <span>Expenses</span>
+                <span>{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(transactionSummary.total_expenses)}</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className="bg-red-500 h-2 rounded-full"
+                  style={{
+                    width: `${(transactionSummary.total_expenses / (transactionSummary.total_income + transactionSummary.total_expenses)) * 100}%`,
+                  }}
+                ></div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="p-4 border rounded bg-white">
-          <h2 className="text-lg font-bold">Net Worth Trend</h2>
-          <NetWorthChart data={netWorthData} />
-        </div>
-
-        <div className="p-4 border rounded bg-white col-span-2">
-          <h2 className="text-lg font-bold">Expense Breakdown</h2>
-          <ExpenseBreakdownChart data={expenseBreakdownData} />
-        </div>
+        <RecentTransactions transactions={recentTransactions} />
       </div>
     </div>
   );
-};
-
-// Helper function to process transactions for income vs. expenses chart
-const processIncomeExpenses = (transactions: any): { month: string; income: number; expenses: number }[] => {
-  const groupedData: any = {};
-  
-  transactions.forEach((t: any) => {
-    const month = new Date(t.date).toLocaleString("default", { month: "short" });
-    if (!groupedData[month]) {
-      groupedData[month] = { month, income: 0, expenses: 0 };
-    }
-    if (t.type === "income") groupedData[month].income += t.amount;
-    else groupedData[month].expenses += t.amount;
-  });
-
-  return Object.values(groupedData);
-};
-
-// Helper function to process transactions for expense breakdown chart
-const processExpenseBreakdown = (transactions: any): { category: string; amount: number }[] => {
-  const groupedData: any = {};
-
-  transactions.forEach((t: any) => {
-    if (!groupedData[t.category]) groupedData[t.category] = { category: t.category, amount: 0 };
-    groupedData[t.category].amount += t.amount;
-  });
-
-  return Object.values(groupedData);
 };
 
 export default Dashboard;
