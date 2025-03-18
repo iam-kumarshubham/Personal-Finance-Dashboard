@@ -35,6 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (credentials: LoginCredentials) => {
     try {
+      setLoading(true);
       setError(null);
       await auth.login(credentials);
       const user = await auth.getCurrentUser();
@@ -42,23 +43,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (err) {
       setError('Invalid email or password');
       throw err;
+    } finally {
+      setLoading(false);
     }
   };
 
   const signup = async (credentials: SignUpCredentials) => {
     try {
+      setLoading(true);
       setError(null);
       await auth.signup(credentials);
       await login({ email: credentials.email, password: credentials.password });
     } catch (err) {
       setError('Failed to create account');
       throw err;
+    } finally {
+      setLoading(false);
     }
   };
 
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
+    setError(null);
   };
 
   return (

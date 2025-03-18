@@ -3,14 +3,14 @@ import { AuthResponse, LoginCredentials, SignUpCredentials, User, Transaction, A
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
-const apiClient = axios.create({
+export const apiClient = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Add token to requests if it exists
+// Add a request interceptor to add the auth token
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -18,6 +18,19 @@ apiClient.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// Add a response interceptor to handle errors
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Handle unauthorized access
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Auth endpoints
 export const auth = {
