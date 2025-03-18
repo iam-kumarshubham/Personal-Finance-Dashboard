@@ -34,15 +34,15 @@ def get_net_worth_trend(
         # Get assets and liabilities for the current date
         assets = db.query(Asset).filter(
             Asset.user_id == current_user.id,
-            Asset.date <= current_date
+            Asset.created_at <= current_date
         ).all()
         
         liabilities = db.query(Liability).filter(
             Liability.user_id == current_user.id,
-            Liability.date <= current_date
+            Liability.created_at <= current_date
         ).all()
         
-        total_assets = sum(asset.amount for asset in assets)
+        total_assets = sum(asset.value for asset in assets)
         total_liabilities = sum(liability.amount for liability in liabilities)
         
         daily_data.append(NetWorthData(
@@ -103,29 +103,29 @@ def get_chart_summary(
     # Get current assets and liabilities
     current_assets = db.query(Asset).filter(
         Asset.user_id == current_user.id,
-        Asset.date <= today
+        Asset.created_at <= today
     ).all()
     current_liabilities = db.query(Liability).filter(
         Liability.user_id == current_user.id,
-        Liability.date <= today
+        Liability.created_at <= today
     ).all()
     
     # Get last month's assets and liabilities
     last_month_assets = db.query(Asset).filter(
         Asset.user_id == current_user.id,
-        Asset.date <= last_month_start
+        Asset.created_at <= last_month_start
     ).all()
     last_month_liabilities = db.query(Liability).filter(
         Liability.user_id == current_user.id,
-        Liability.date <= last_month_start
+        Liability.created_at <= last_month_start
     ).all()
     
     # Calculate totals
-    total_assets = sum(asset.amount for asset in current_assets)
+    total_assets = sum(asset.value for asset in current_assets)
     total_liabilities = sum(liability.amount for liability in current_liabilities)
     net_worth = total_assets - total_liabilities
     
-    last_month_total_assets = sum(asset.amount for asset in last_month_assets)
+    last_month_total_assets = sum(asset.value for asset in last_month_assets)
     last_month_total_liabilities = sum(liability.amount for liability in last_month_liabilities)
     last_month_net_worth = last_month_total_assets - last_month_total_liabilities
     
